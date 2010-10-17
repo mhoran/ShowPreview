@@ -1,9 +1,12 @@
 var PREFIX = "artist";
 var LINK_PREFIX = "link";
-var EVENT_URL = "http://api.songkick.com/api/3.0/events.json?apikey=musichackdayboston&artists=";
+var EVENT_URL = "http://api.songkick.com/api/3.0/events.json?apikey=musichackdayboston&artists="; // swap this out
+var isMobile; // mobile or web?
+var position = new Object(); // holds the current location
 
 $(document).ready(function(){
-	//
+	isMobile = isMobileBrowser();
+	getLocation();
 });
 
 function getPaddedDate() {
@@ -33,7 +36,8 @@ function getShows() {
 		return;
 	}
 	
-	// add in geolocation to event url &latitude=30.0&longitude=15.5&artist_name=name
+	
+	// position.latitude, position.longitude
 	
 	
 	$("#info").html("<p>Searching <img src='images/loading_bar.gif' style='margin-left: 10px;'/></p>");
@@ -70,8 +74,6 @@ function getTonightsShow(data) {
 	return true;
 }
 
-// todo: check out link
-
 function getArtists(data) {
 	var openers = new Array();
 	var e = data.resultsPage.results.event[0];
@@ -91,8 +93,6 @@ function getArtists(data) {
 		} else {
 			str += " -- No Musicbrainz ID. Sorry.";
 		}
-		
-		console.log("closing p...");
 		
 		str += "</p>";
 		
@@ -120,7 +120,12 @@ function getAudio(mbid, pid) {
 		$(data).each(function(index) {
 			var id = LINK_PREFIX + pid + index;
 			
-			html += "<li id='" + id + "'><a href='#' onClick=\"javascript: addPlayerTo('" + id + "','" + this.tracks[0].preview_url + "')\">" + this.title + "</a></li>";
+			if(isMobile) {
+				html += "<li id='" + id + "'><a href='" + this.tracks[0].preview_url + "')\">" + this.title + "</a></li>";
+			} else {
+				html += "<li id='" + id + "'><a href='#' onClick=\"javascript: addPlayerTo('" + id + "','" + this.tracks[0].preview_url + "')\">" + this.title + "</a></li>";
+			}
+			
 		});
 		
 		html += "</ul>";
@@ -132,8 +137,18 @@ function getAudio(mbid, pid) {
 	  });
 }
 
-//
-// todo: position player next to current song
+function isMobileBrowser() {
+	var uagent = navigator.userAgent.toLowerCase();
+	var mobiles = ["iphone", "ipad", "android", "windows ce", "blackberry", "symbian", "palm"];
+	
+	for (var i = 0; i < mobiles.length; i++) {
+		if(uagent.indexOf(mobiles[i]) > -1) {
+			return true;
+		}
+	}
+	
+	return false;
+}
 
 function playAudio(url) {	
 	var player = "<p><audio controls preload='auto' autobuffer><source src='" + url + "'/></audio>";
@@ -177,4 +192,23 @@ function addPlayerTo(elemId, url) {
 	.jPlayer("onSoundComplete", function() {
 		this.element.jPlayer("play");
 	});
+}
+
+// geo location shit
+function getLocation() {
+	if(geo_position_js.init()){
+		geo_position_js.getCurrentPosition(success_callback,error_callback,{enableHighAccuracy:true,options:5000});
+	}
+	else{
+		console.log("Functionality not available");
+	}
+}
+
+function success_callback(p) {
+	position.latitude = p.coords.latitude.toFixed(2);
+	position.longitude = p.coords.longitude.toFixed(2);
+}
+
+function error_callback(p) {
+	console.log('error='+p.message);
 }
