@@ -28,7 +28,14 @@ function getShows() {
 	var name = escape( $("#bandName").val() );
 	var url = EVENT_URL + name + "&min_date=" + getPaddedDate() + "&max_date=" + getPaddedDate() + "&jsoncallback=?";
 	
-	// add in geolocation
+	if (!name) {
+		$("#info").html("<p>Who are you searching for? Please enter an artist!</p>");
+		return;
+	}
+	
+	// add in geolocation to event url &latitude=30.0&longitude=15.5&artist_name=name
+	
+	
 	$("#info").html("<p>Searching <img src='images/loading_bar.gif' style='margin-left: 10px;'/></p>");
 	
 	$.getJSON(url,
@@ -39,6 +46,7 @@ function getShows() {
 		$("#support").html("");
 		
 		if (!getTonightsShow(data)) {
+			$("<p>No " + $("#bandName").val() + " shows tonight!</p>").appendTo("#info");
 			return;
 		}
 		
@@ -48,13 +56,14 @@ function getShows() {
 }
 
 function getTonightsShow(data) {
-	// get the first event (assuming that artist will not perform more than once per night)
-	var e = data.resultsPage.results.event[0];
+	var e = data.resultsPage.results.event;
 	
-	if (!e) {
-		$("<p>No shows tonight!</p>").appendTo("#info");
+	// get the first event (assuming that artist will not perform more than once per night)
+	if (e == undefined) {
 		return false;
 	}
+	
+	var e = e[0];
 	
 	$("<p>Link: <a href='" + e.uri + "' target='_blank'>" + e.displayName + "</a></p>").appendTo("#info");
 	
