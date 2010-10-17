@@ -1,0 +1,31 @@
+body {
+	background-image: url("../images/bg.gif");
+}
+
+a:link, a:visited {
+	color: #1FCDF0;
+}
+
+p {
+	font-family: Courier, monospace;
+	color: #fff;
+}
+
+.title {
+	color: #FFE017;
+}
+
+h3 {
+	font-family: Courier, monospace;
+	font-weight: bold;
+	font-size: 24px;
+	color: #fff;	
+	text-shadow: 1px 1px 1px #ddd;
+	border: 1px solid #ddd;
+}
+
+#audioPlayer {
+	position: fixed;
+	top: 10px;
+	bottom: -80px;
+}
