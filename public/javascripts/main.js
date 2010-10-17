@@ -33,6 +33,12 @@ function getShows() {
 	//var url = EVENT_URL + name + "&min_date=" + getPaddedDate() + "&max_date=" + getPaddedDate() + "&jsoncallback=?";
 	var url = "/shows/search?artist_name=" + name + "&latitude=" + position.latitude + "&longitude=" + position.longitude;
 	
+	if (position.latitude == undefined ||
+		position.longitude == undefined) {
+			$("#info").html("<p>Can't detect location. Please allow your browser to send your location.</p>");
+			return;
+		}
+	
 	if (!name) {
 		$("#info").html("<p>Who are you searching for? Please enter an artist!</p>");
 		return;
