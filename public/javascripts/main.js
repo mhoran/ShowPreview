@@ -3,6 +3,7 @@ var LINK_PREFIX = "link";
 var EVENT_URL = "http://api.songkick.com/api/3.0/events.json?apikey=musichackdayboston&artists="; // swap this out
 var isMobile; // mobile or web?
 var position = new Object(); // holds the current location
+var SORRY_MSG = "Sorry, no songs available for this artist";
 
 $(document).ready(function(){
 	isMobile = isMobileBrowser();
@@ -29,7 +30,8 @@ function zeroPad(numStr) {
 
 function getShows() {
 	var name = escape( $("#bandName").val() );
-	var url = EVENT_URL + name + "&min_date=" + getPaddedDate() + "&max_date=" + getPaddedDate() + "&jsoncallback=?";
+	//var url = EVENT_URL + name + "&min_date=" + getPaddedDate() + "&max_date=" + getPaddedDate() + "&jsoncallback=?";
+	var url = "/shows/search?artist_name=" + name + "&latitude=" + position.latitude + "&longitude=" + position.longitude;
 	
 	if (!name) {
 		$("#info").html("<p>Who are you searching for? Please enter an artist!</p>");
@@ -60,14 +62,22 @@ function getShows() {
 }
 
 function getTonightsShow(data) {
-	var e = data.resultsPage.results.event;
+	//console.log(data);
+//	return;
+	
+	//var e = data.resultsPage.results.event;
+	var e = data;
+	
+	if( e["start"].date !== getPaddedDate() ) {
+		$("#showDate").text("No show in your area tonight! The next performance in your area is " + getPaddedDate());
+	}
 	
 	// get the first event (assuming that artist will not perform more than once per night)
 	if (e == undefined) {
 		return false;
 	}
 	
-	var e = e[0];
+	//var e = e[0];
 	
 	$("<p>Link: <a href='" + e.uri + "' target='_blank'>" + e.displayName + "</a></p>").appendTo("#info");
 	
@@ -76,7 +86,8 @@ function getTonightsShow(data) {
 
 function getArtists(data) {
 	var openers = new Array();
-	var e = data.resultsPage.results.event[0];
+	//var e = data.resultsPage.results.event[0];
+	var e = data;
 	
 	$("<p><h3>Support Acts:</h3></p>").appendTo("#support");
 	$("<p><h3>Headlining Acts:</h3></p>").appendTo("#headline");
@@ -89,9 +100,9 @@ function getArtists(data) {
 			var mbid = this.artist.identifier[0].mbid;
 			getAudio(mbid, pid);
 			
-			str += "<img id='loadingBar' src='images/loading_bar.gif'/>";
+			str += "<img id='loadingBar' src='images/loading_circle.gif'/>";
 		} else {
-			str += " -- No Musicbrainz ID. Sorry.";
+			str += "<ul><li>" + SORRY_MSG + "</li></ul>";
 		}
 		
 		str += "</p>";
@@ -102,8 +113,6 @@ function getArtists(data) {
 			$(str).appendTo("#headline");
 		}
 	});
-	
-	// pass musicbrainz artist id
 }
 
 // music brainz id and paragraph id to append to
@@ -111,7 +120,6 @@ function getAudio(mbid, pid) {
 	var AUDIO_URL = '/artists/' + mbid + '/songs.json';
 	
 	// todo: add error checking to request
-	var loading = "<img src='images/loading_bar.gif'/>";
 	
 	$.getJSON(AUDIO_URL,
 	  function(data) {
@@ -128,12 +136,16 @@ function getAudio(mbid, pid) {
 			
 		});
 		
+		// check for no songs
+		if (data.length == 0) {
+			html += "<li>" + SORRY_MSG + "</li>";
+		}
+		
 		html += "</ul>";
 		
 		$(html).insertAfter("#"+pid);
 		
 		$("#loadingBar").remove();
-		
 	  });
 }
 
