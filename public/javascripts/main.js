@@ -55,6 +55,11 @@ function getShows() {
 	$("#support").html("");
 	$("#showDate").text("");
 	
+	$('#info').ajaxError(function() {
+		$(this).text('Search failed. Please try again later.');
+		$("#searching").html("");
+	});
+	
 	$.getJSON(url,
 	  function(data) {
 		
