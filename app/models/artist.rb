@@ -5,7 +5,7 @@ class Artist
   format :json
 
   def songs(params = {})
-    q = params.merge(:artist_id => "musicbrainz:artist:#{@mbid}", :sort => 'artist_hotttnesss-desc', :limit => true)
+    q = params.merge(:artist_id => "musicbrainz:artist:#{@mbid}", :sort => 'song_hotttnesss-desc', :limit => true)
     a = [q.to_params, 'bucket=id:7digital', 'bucket=tracks']
     r = self.class.get('/api/v4/playlist/static', :query => a)['response']
     # songs should be unique
