@@ -1,8 +1,9 @@
-var PREFIX = "artist"
-var baseUrl = "http://api.songkick.com/api/3.0/events.json?apikey=musichackdayboston&artists=";
+var PREFIX = "artist";
+var LINK_PREFIX = "link";
+var EVENT_URL = "http://api.songkick.com/api/3.0/events.json?apikey=musichackdayboston&artists=";
 
-$(document).ready(function() {
-	
+$(document).ready(function(){
+	//
 });
 
 function getPaddedDate() {
@@ -25,7 +26,7 @@ function zeroPad(numStr) {
 
 function getShows() {
 	var name = escape( $("#bandName").val() );
-	var url = baseUrl + name + "&min_date=" + getPaddedDate() + "&max_date=" + getPaddedDate() + "&jsoncallback=?";
+	var url = EVENT_URL + name + "&min_date=" + getPaddedDate() + "&max_date=" + getPaddedDate() + "&jsoncallback=?";
 	
 	// add in geolocation
 	$("#info").html("<p>Searching <img src='images/loading_bar.gif' style='margin-left: 10px;'/></p>");
@@ -41,28 +42,28 @@ function getShows() {
 			return;
 		}
 		
-		getOpeners(data);
+		getArtists(data);
 		
 	  });
 }
 
 function getTonightsShow(data) {
 	// get the first event (assuming that artist will not perform more than once per night)
-	var e = data.resultsPage.results.event;
+	var e = data.resultsPage.results.event[0];
 	
 	if (!e) {
 		$("<p>No shows tonight!</p>").appendTo("#info");
 		return false;
 	}
 	
-	$("<p>Link: <a href='" + this.uri + "' target='_blank'>" + e[0].displayName + "</a></p>").appendTo("#info");
+	$("<p>Link: <a href='" + e.uri + "' target='_blank'>" + e.displayName + "</a></p>").appendTo("#info");
 	
 	return true;
 }
 
 // todo: check out link
 
-function getOpeners(data) {
+function getArtists(data) {
 	var openers = new Array();
 	var e = data.resultsPage.results.event[0];
 	
@@ -75,11 +76,14 @@ function getOpeners(data) {
 		
 		if (this.artist.identifier[0]) {
 			var mbid = this.artist.identifier[0].mbid;
-			
 			getAudio(mbid, pid);
+			
+			str += "<img id='loadingBar' src='images/loading_bar.gif'/>";
 		} else {
 			str += " -- No Musicbrainz ID. Sorry.";
 		}
+		
+		console.log("closing p...");
 		
 		str += "</p>";
 		
@@ -95,19 +99,27 @@ function getOpeners(data) {
 
 // music brainz id and paragraph id to append to
 function getAudio(mbid, pid) {
-	var url = '/artists/' + mbid + '/songs.json';
+	var AUDIO_URL = '/artists/' + mbid + '/songs.json';
 	
-	$.getJSON(url,
+	// todo: add error checking to request
+	var loading = "<img src='images/loading_bar.gif'/>";
+	
+	$.getJSON(AUDIO_URL,
 	  function(data) {
 		var html = "<ul>";
 		
 		$(data).each(function(index) {
-			html += "<li><a href='#' onClick=\"javascript: playAudio('" + this.tracks[0].preview_url + "')\">" + this.title + "</a></li>";
+			var id = LINK_PREFIX + pid + index;
+			
+			html += "<li id='" + id + "'><a href='#' onClick=\"javascript: addPlayerTo('" + id + "','" + this.tracks[0].preview_url + "')\">" + this.title + "</a></li>";
 		});
 		
 		html += "</ul>";
 		
 		$(html).insertAfter("#"+pid);
+		
+		$("#loadingBar").remove();
+		
 	  });
 }
 
@@ -125,4 +137,35 @@ function playAudio(url) {
 
 function closePlayer() {
 	$("#audioPlayer").html("");
+}
+
+var jp = "<div id='playerContainer'><div id='jquery_jplayer'></div><div class='jp-single-player'><div class='jp-interface'><ul class='jp-controls'><li><a href='#' id='jplayer_play' class='jp-play' tabindex='1'>play</a></li><li><a href='#' id='jplayer_pause' class='jp-pause' tabindex='1'>pause</a></li><li><a href='#' id='jplayer_stop' class='jp-stop' tabindex='1'>stop</a></li><li><a href='#' id='jplayer_volume_min' class='jp-volume-min' tabindex='1'>min volume</a></li><li><a href='#' id='jplayer_volume_max' class='jp-volume-max' tabindex='1'>max volume</a></li></ul><div class='jp-progress'><div id='jplayer_load_bar' class='jp-load-bar'><div id='jplayer_play_bar' class='jp-play-bar'></div></div></div><div id='jplayer_volume_bar' class='jp-volume-bar'><div id='jplayer_volume_bar_value' class='jp-volume-bar-value'></div></div><div id='jplayer_play_time' class='jp-play-time'></div><div id='jplayer_total_time' class='jp-total-time'></div></div></div></div>";
+
+function addPlayerTo(elemId, url) {
+	// delete the player from the current element if it exists
+	if ($("#playerContainer")) {
+		$("#playerContainer").remove();
+	}
+	
+	// Add jPlayer after link
+	$(jp).appendTo("#"+elemId);
+	
+	
+	// Local copy of jQuery selectors, for performance.
+	var jpPlayTime = $("#jplayer_play_time");
+	var jpTotalTime = $("#jplayer_total_time");
+
+	$("#jquery_jplayer").jPlayer({
+		ready: function () {
+			this.element.jPlayer("setFile", url).jPlayer("play");
+		},
+		volume: 50
+	})
+	.jPlayer("onProgressChange", function(loadPercent, playedPercentRelative, playedPercentAbsolute, playedTime, totalTime) {
+		jpPlayTime.text($.jPlayer.convertTime(playedTime));
+		jpTotalTime.text($.jPlayer.convertTime(totalTime));
+	})
+	.jPlayer("onSoundComplete", function() {
+		this.element.jPlayer("play");
+	});
 }
