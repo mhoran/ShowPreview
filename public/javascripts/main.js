@@ -3,10 +3,14 @@ var LINK_PREFIX = "link";
 var EVENT_URL = "http://api.songkick.com/api/3.0/events.json?apikey=musichackdayboston&artists="; // swap this out
 var isMobile; // mobile or web?
 var position = new Object(); // holds the current location
+var positionAquired = false;
 var SORRY_MSG = "Sorry, no songs available for this artist";
 
 $(document).ready(function(){
 	isMobile = isMobileBrowser();
+	
+	$("#info").text("Aquiring location. Please wait...");
+	
 	getLocation();
 });
 
@@ -33,6 +37,10 @@ function getShows() {
 	//var url = EVENT_URL + name + "&min_date=" + getPaddedDate() + "&max_date=" + getPaddedDate() + "&jsoncallback=?";
 	var url = "/shows/search?artist_name=" + name + "&latitude=" + position.latitude + "&longitude=" + position.longitude;
 	
+	if (!positionAquired) {
+		return;
+	}
+	
 	if (position.latitude == undefined ||
 		position.longitude == undefined) {
 			$("#info").html("<p>Can't detect location. Please allow your browser to send your location.</p>");
@@ -58,6 +66,7 @@ function getShows() {
 	$('#info').ajaxError(function() {
 		$(this).text('Search failed. Please try again later.');
 		$("#searching").html("");
+		
 	});
 	
 	$.getJSON(url,
@@ -233,6 +242,9 @@ function getLocation() {
 function success_callback(p) {
 	position.latitude = p.coords.latitude.toFixed(2);
 	position.longitude = p.coords.longitude.toFixed(2);
+	positionAquired = true;
+	
+	$("#info").text("");
 }
 
 function error_callback(p) {
