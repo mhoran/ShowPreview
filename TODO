@@ -1,0 +1,13 @@
+* HTML5 audio no-go in Android; Flash component for FroYo, else launch default
+  player.  Test on iPhone. jPlayer probably makes sense here ...
+* Use geo-location to find the show you're looking for is at, instead of
+  limiting the search to today (limit to this week, perhaps.)
+* Come up with a better name.
+* Empty search leaves spinner running.
+* Fix CSS for mobile.
+* Hide the HTML5 audio control (and Flash control) altogether.  Instead,
+  control with JavaScript and custom buttons.
+* Fix the show link.
+* Add to the wiki!
+* Gracefully handle backend errors.
+* Move Songkick API calls to backend.
