@@ -26,6 +26,7 @@ h3 {
 
 #audioPlayer {
 	position: fixed;
-	top: 10px;
+	top: 0px;
+	left: 500px;
 	bottom: -80px;
 }

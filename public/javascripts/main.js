@@ -60,6 +60,8 @@ function getTonightsShow(data) {
 	return true;
 }
 
+// todo: check out link
+
 function getOpeners(data) {
 	var openers = new Array();
 	var e = data.resultsPage.results.event[0];
@@ -100,7 +102,7 @@ function getAudio(mbid, pid) {
 		var html = "<ul>";
 		
 		$(data).each(function(index) {
-			html += "<li><a href='#' onClick='javascript: playAudio(\"" + this.url + "\")'>" + this.title + "</a></li>";
+			html += "<li><a href='#' onClick=\"javascript: playAudio('" + this.url + "')\">" + this.title + "</a></li>";
 		});
 		
 		html += "</ul>";
@@ -108,6 +110,9 @@ function getAudio(mbid, pid) {
 		$(html).insertAfter("#"+pid);
 	  });
 }
+
+//
+// todo: position player next to current song
 
 function playAudio(url) {	
 	var player = "<p><audio controls preload='auto' autobuffer><source src='" + url + "'/></audio>";
