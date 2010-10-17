@@ -42,14 +42,15 @@ function getShows() {
 	// position.latitude, position.longitude
 	
 	
-	$("#info").html("<p>Searching <img src='images/loading_bar.gif' style='margin-left: 10px;'/></p>");
+	$("#searching").html("<p>Searching <img src='images/loading_bar.gif' style='margin-left: 10px;'/></p>");
+	
+	$("#info").html("");
+	$("#headline").html("");
+	$("#support").html("");
+	$("#showDate").text("");
 	
 	$.getJSON(url,
 	  function(data) {
-		
-		$("#info").html("");
-		$("#headline").html("");
-		$("#support").html("");
 		
 		if (!getTonightsShow(data)) {
 			$("<p>No " + $("#bandName").val() + " shows tonight!</p>").appendTo("#info");
@@ -113,6 +114,8 @@ function getArtists(data) {
 			$(str).appendTo("#headline");
 		}
 	});
+	
+	$("#searching").html("");
 }
 
 // music brainz id and paragraph id to append to
