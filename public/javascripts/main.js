@@ -1,6 +1,4 @@
-var HORAN = "http://10.10.11.27:3000/artists/";
 var PREFIX = "artist"
-var JSON_PATH = "http://localhost:8888/ShowPlannr/public/test.json"
 var baseUrl = "http://api.songkick.com/api/3.0/events.json?apikey=musichackdayboston&artists=";
 
 $(document).ready(function() {
@@ -95,8 +93,7 @@ function getOpeners(data) {
 
 // music brainz id and paragraph id to append to
 function getAudio(mbid, pid) {
-	//var url = HORAN + mbid;
-	var url = JSON_PATH;
+	var url = '/artists/' + mbid + '/songs.json';
 	
 	$.getJSON(url,
 	  function(data) {
