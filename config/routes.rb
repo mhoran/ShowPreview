@@ -2,6 +2,8 @@ ShowPlannr::Application.routes.draw do
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
+  match 'shows/search' => 'shows#search'
+  match 'shows/search.:format' => 'shows#search'
   match 'artists/:id/songs.:format' => 'artists#songs'
 
   # Sample of regular route:
