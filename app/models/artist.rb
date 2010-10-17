@@ -1,14 +1,15 @@
 class Artist
   include HTTParty
   base_uri 'developer.echonest.com'
-  default_params :api_key => 'N6E4NIOVYMTHNDM8J'
+  default_params :api_key => 'TH75GDXMUNRGGZJYV'
   format :json
 
-  def songs(options = {})
-    q = options.merge(:id => "musicbrainz:artist:#{@mbid}")
-    r = self.class.get('/api/v4/artist/audio', :query => q)['response']
+  def songs(params = {})
+    q = params.merge(:artist_id => "musicbrainz:artist:#{@mbid}", :sort => 'artist_hotttnesss-desc', :limit => true)
+    a = [q.to_params, 'bucket=id:7digital', 'bucket=tracks']
+    r = self.class.get('/api/v4/playlist/static', :query => a)['response']
     # songs should be unique
-    r && r['status']['code'] == 0 ? r['audio'] : []
+    r && r['status']['code'] == 0 ? r['songs'] : []
   end
 
   def self.find(mbid)

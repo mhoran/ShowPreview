@@ -102,7 +102,7 @@ function getAudio(mbid, pid) {
 		var html = "<ul>";
 		
 		$(data).each(function(index) {
-			html += "<li><a href='#' onClick=\"javascript: playAudio('" + this.url + "')\">" + this.title + "</a></li>";
+			html += "<li><a href='#' onClick=\"javascript: playAudio('" + this.tracks[0].preview_url + "')\">" + this.title + "</a></li>";
 		});
 		
 		html += "</ul>";
