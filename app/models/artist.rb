@@ -8,7 +8,6 @@ class Artist
     q = params.merge(:artist_id => "musicbrainz:artist:#{@mbid}", :sort => 'song_hotttnesss-desc', :limit => true)
     a = [q.to_params, 'bucket=id:7digital', 'bucket=tracks']
     r = self.class.get('/api/v4/playlist/static', :query => a)['response']
-    # songs should be unique
     r && r['status']['code'] == 0 ? r['songs'] : []
   end
 
